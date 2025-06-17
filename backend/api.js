@@ -1,6 +1,9 @@
 import {
   getDinos
 } from "./getDinos.js";
+import {
+  ranker
+} from "./ranker.js";
 
 async function handleApi(_req) {
   const url = new URL(_req.url);
@@ -26,6 +29,15 @@ async function handleApi(_req) {
         "content-type": "application/json",
       },
     });
+  } if (path === "/api/dinos/set") {
+    const four = await ranker.retrieveFour();
+    
+    return new Response(JSON.stringify(four), {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+      },
+    });
   }
   
   return new Response("404", {
@@ -35,6 +47,12 @@ async function handleApi(_req) {
     },
   });
 }
+
+async function testRanker() {
+  await ranker.init();
+}
+
+testRanker();
 
 export {
   handleApi,
