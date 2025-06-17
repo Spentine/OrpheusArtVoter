@@ -9,6 +9,10 @@ The leaderboard should order all of the artworks from best to worst in a grid so
 ### Voting
 The voting method is simple. The user is presented 4 images, and is asked to order them from worst to best. After they submit the ordering, they will be continuously presented with more random selections of images. Over time, with many users, there should gradually develop an ordering of images based on how good they are.
 
+Each image will be shrinked to have a square aspect ratio. If the image is clicked on in a particular way, it should put it into full screen and allow for the user to truly admire its beauty. On PC, they can order the images by using the keyboard buttons 1 through 4, by clicking each of the images in order normally, or by dragging the image. On mobile, the images can be ordered through clicking or by dragging.
+
+Perhaps, to view the image, the image could be dragged to a box where it will then be shown in full screen.
+
 ## Algorithmic Specifics
 The algorithm should somehow rank each image based off of the orderings provided. The presentation of orderings should not affect the final outcome.
 

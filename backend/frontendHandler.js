@@ -16,7 +16,8 @@ async function retrieveFile(path) {
 }
 
 function generateValidPath(path) {
-  if (path === "/") return "frontend/index.html";
+  if (!path.includes(".")) path += ".html";
+  if (path === "/.html") return "frontend/index.html";
   path = "frontend" + path;
   return path;
 }
@@ -42,8 +43,10 @@ async function handleFrontend(_req) {
     });
   }
   
-  const notFound = await retrieveFile("/404.html")
-  return new Response(notFound, {
+  const file = await retrieveFile(generateValidPath("/404.html"));
+  const decoder = new TextDecoder();
+  const data = decoder.decode(file.file);
+  return new Response(data, {
     status: 404,
     headers: {
       "content-type": "text/html",

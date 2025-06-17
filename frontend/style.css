@@ -3,6 +3,8 @@
 body {
   background: linear-gradient(90deg, #b3f4ff, #bbba83);
   font-family: "Livvic", sans-serif;
+  
+  margin: 16px;
 }
 
 .all-container {
@@ -61,5 +63,9 @@ img {
 
 .image-caption {
   color: #000000c0;
+  text-align: center;
+}
+
+.centered-text {
   text-align: center;
 }
