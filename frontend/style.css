@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Livvic:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,900&display=swap');
+
+body {
+  background: linear-gradient(90deg, #b3f4ff, #bbba83);
+  font-family: "Livvic", sans-serif;
+}
+
+.all-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h1, h2, h3, p {
+  font-weight: normal;
+  margin: 0;
+}
+
+img {
+  border-radius: 4px;
+  border: 1px solid #00000080;
+}
+
+.main-title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.main-subtitle {
+  text-align: center;
+}
+
+.main-container {
+  background-color: #00000040;
+  border: 1px solid #00000080;
+  border-radius: 8px;
+  
+  margin: 16px;
+  padding: 16px;
+}
+
+.info-heading {
+  margin: 8px;
+}
+
+.info-container {
+  background: #00000020;
+  border: 1px solid #00000080;
+  border-radius: 4px;
+  
+  padding: 16px;
+}
+
+.info-split {
+  display: flex;
+  flex-direction: row;
+  
+  gap: 16px;
+  margin: 16px;
+}
+
+.image-caption {
+  color: #000000c0;
+  text-align: center;
+}
