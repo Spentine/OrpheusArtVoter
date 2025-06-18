@@ -24,9 +24,29 @@ async function getDinosFetch() {
   for (const file of tree) {
     if (file.path === ".gitignore") continue; // skip .gitignore file
     if (file.path === "README.md") continue; // skip README file
+    if (file.path === "CNAME") continue; // skip CNAME file
+    if (file.path === "svg") continue; // skip svg directory
+    if (file.path === "LICENSE") continue; // skip LICENSE file
     dinos[file.sha] = {
       name: file.path,
       image: `https://raw.githubusercontent.com/hackclub/dinosaurs/main/${file.path}`,
+    };
+  }
+  
+  const svgResponse = await fetch("https://api.github.com/repos/hackclub/dinosaurs/git/trees/67a02673eeb1407a09a4ff57efbc641c0a56f07b");
+  if (!svgResponse.ok) {
+    return {
+      success: false,
+      error: `Failed to fetch SVG dinos: ${svgResponse.status} ${svgResponse.statusText}`
+    };
+  }
+  
+  const svgData = await svgResponse.json();
+  const svgTree = svgData.tree;
+  for (const file of svgTree) {
+    dinos[file.sha] = {
+      name: file.path,
+      image: `https://raw.githubusercontent.com/hackclub/dinosaurs/83058f0954dd232d7fdc4b87079ee1dde3105539/svg/${file.path}`,
     };
   }
   

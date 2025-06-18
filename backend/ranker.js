@@ -25,6 +25,7 @@ class Ranker {
   async init() {
     this.ordersCache = await this.readOrders();
     this.servedCache = await this.readServed();
+    // this.inferServed();
     this.rankingsCache = await this.retrieveRankings(); // my naming scheme is messed up
     this.generateRankings(this.ordersCache);
   }
@@ -78,6 +79,17 @@ class Ranker {
     }
   }
   
+  async inferServed() {
+    this.servedCache = await this.newServed();
+    for (const order in this.ordersCache) {
+      const ranking = this.ordersCache[order].ranking;
+      for (const dino of ranking) {
+        this.servedCache[dino] += 1;
+      }
+    }
+    return this.servedCache;
+  }
+  
   async writeToServed(value) {
     await Deno.writeTextFile(
       servedLocation,
@@ -90,7 +102,7 @@ class Ranker {
    * retrieves four dino images that have been served the least
    */
   async retrieveFour() {
-    const leastServed = [];
+    let candidates = [];
     let leastCount = Infinity;
     const hashes = Object.keys(this.servedCache);
     for (const hash of hashes) {
@@ -99,37 +111,49 @@ class Ranker {
       // skip hash if it has been served more than the leastCount
       if (hashCount > leastCount) continue;
       
-      // if the hashCount is equal to the leastCount, add it to the leastServed array
+      // if the hashCount is equal to the leastCount, add it to the candidates array
       if (hashCount === leastCount) {
-        leastServed.push(hash);
+        candidates.push(hash);
         continue;
       }
       
       // if the hashCount is less than the leastCount, clear the array and add the hash
       if (hashCount < leastCount) {
         
-        leastServed.push(hash);
+        candidates.push(hash);
         leastCount = hashCount;
       }
     }
     
+    if (leastCount > 0) {
+      // try to retrieve images close to each other on the leaderboard
+      const orderedHashes = this.rankingsCache.ranked;
+      const orderedCandidates = orderedHashes.filter(hash => candidates.includes(hash));
+      if (orderedCandidates.length >= 4) {
+        const randomIndex = Math.floor(Math.random() * (orderedCandidates.length - 3));
+        candidates = orderedCandidates.slice(randomIndex, 4);
+      } else {
+        candidates = orderedCandidates; // fallback to whatever we have
+      }
+    }
+    
     // if there are less than 4 hashes, add random ones until there are 4
-    if (leastServed.length < 4) {
-      while (leastServed.length < 4) {
+    if (candidates.length < 4) {
+      while (candidates.length < 4) {
         const randomHash = hashes[Math.floor(Math.random() * hashes.length)];
         
-        // check if the random hash is already in the leastServed array
-        if (!leastServed.includes(randomHash)) {
-          leastServed.push(randomHash);
+        // check if the random hash is already in the candidates array
+        if (!candidates.includes(randomHash)) {
+          candidates.push(randomHash);
         }
       }
     }
     
-    // choose 4 random hashes from the array
     const selectedHashes = [];
+    // choose 4 random hashes from the array
     while (selectedHashes.length < 4) {
-      const randomIndex = Math.floor(Math.random() * leastServed.length);
-      const randomHash = leastServed[randomIndex];
+      const randomIndex = Math.floor(Math.random() * candidates.length);
+      const randomHash = candidates[randomIndex];
       
       // check if the hash is already in the selectedHashes array
       if (!selectedHashes.includes(randomHash)) {

@@ -12,3 +12,5 @@ All API calls will use `/api/`.
   - Retrieves four dinos.
 - `/dinos/submit`
   - Submits an ordering of four dinos.
+
+nah nvm im deprecating this im too lazy

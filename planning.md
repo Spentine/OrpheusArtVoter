@@ -20,10 +20,12 @@ In a perfect scenario, after four images are presented, given names $d_1$ throug
 
 However, people have different preferences, and even the same person may forget and order it differently. To account for this, the algorithm should be more approximate in terms of its decisions. Generally, given four images, the ordering should be $d_1 \gtrapprox d_2 \gtrapprox d_3 \gtrapprox d_4$.
 
-### Method 1
-One method to create a hierarchical order from these orderings would be to track the average position of every image relative to each other. For example, if an image $d_n$ has relative orderings $[4, 3, 3, 4, 4, 2, 3, 4]$, its score will be $\frac{4 + 3 + 3 + 4 + 4 + 2 + 3 + 4}{8}$, or an average placement of $3.375$. All the images' average position is then ranked and determines its position on the leaderboard.
+Anyways, I just used an algorithm someone else made called *power iteration*. All I know is that it works with convergence.
 
-This method, however, requires a lot of voting and rating to work. There may also be images which are only voted a very low number of times and wouldn't have an accurate score.
+The other part of the problem is to decide what images to serve. Below will be the algorithm used to decide how to serve images:
 
-### Method 2
-Another method to create a hierarchical order from these orderings would be to track the position of images relative to each other.
+### If there are images that have not been served yet
+If there are images there weren't served yet, serve them at random. If there are less than 4 images that weren't served yet, then choose any random image to fill up the rest of the slots.
+
+### If there is a ranking
+Once all of the images have been served at least once, serve images with the least amount of serves and are nearby on the leaderboard.

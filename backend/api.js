@@ -94,6 +94,36 @@ async function handleApi(_req, hostname) {
         "content-type": "text/plain",
       },
     });
+  } else if (path === "/api/dinos/count") {
+    const dinosData = await getDinos();
+
+    // error handling
+    if (!dinosData.success) {
+      return new Response(dinosData.error, {
+        status: 500,
+        headers: {
+          "content-type": "text/plain",
+        },
+      });
+    }
+
+    const count = Object.keys(dinosData.dinos).length;
+
+    return new Response(count.toString(), {
+      status: 200,
+      headers: {
+        "content-type": "text/plain",
+      },
+    });
+  } else if (path === "/api/order/count") {
+    const orders = ranker.ordersCache.length;
+    
+    return new Response(orders.toString(), {
+      status: 200,
+      headers: {
+        "content-type": "text/plain",
+      },
+    });
   }
   
   return new Response("404", {
