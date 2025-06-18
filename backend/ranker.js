@@ -35,6 +35,11 @@ class Ranker {
     const str = JSON.stringify(order) + "\n";
     await Deno.writeTextFile(ordersLocation, str, { append: true });
     this.unseenOrders.push(order);
+    
+    const ranking = order.ranking;
+    for (const hash of ranking) {
+      this.servedCache[hash] += 1; // increment served count
+    }
   }
 
   async readOrders() {
@@ -119,7 +124,7 @@ class Ranker {
       
       // if the hashCount is less than the leastCount, clear the array and add the hash
       if (hashCount < leastCount) {
-        
+        candidates.length = 0; // clear the array
         candidates.push(hash);
         leastCount = hashCount;
       }

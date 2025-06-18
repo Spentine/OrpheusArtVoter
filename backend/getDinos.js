@@ -27,6 +27,7 @@ async function getDinosFetch() {
     if (file.path === "CNAME") continue; // skip CNAME file
     if (file.path === "svg") continue; // skip svg directory
     if (file.path === "LICENSE") continue; // skip LICENSE file
+    if (file.path === "MAINTAINERS.md") continue; // skip MAINTAINERS file
     dinos[file.sha] = {
       name: file.path,
       image: `https://raw.githubusercontent.com/hackclub/dinosaurs/main/${file.path}`,
