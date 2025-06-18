@@ -23,6 +23,7 @@ async function getDinosFetch() {
   const dinos = {};
   for (const file of tree) {
     if (file.path === ".gitignore") continue; // skip .gitignore file
+    if (file.path === "README.md") continue; // skip README file
     dinos[file.sha] = {
       name: file.path,
       image: `https://raw.githubusercontent.com/hackclub/dinosaurs/main/${file.path}`,

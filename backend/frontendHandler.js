@@ -30,12 +30,10 @@ async function handleFrontend(_req) {
   const retrievedFile = await retrieveFile(validPath);
   if (retrievedFile.success) {
     const file = retrievedFile.file;
-    const decoder = new TextDecoder();
-    const data = decoder.decode(file);
     
     const contentType = mime.lookup(validPath);
     
-    return new Response(data, {
+    return new Response(file, {
       status: 200,
       headers: {
         "content-type": contentType || "text/plain",

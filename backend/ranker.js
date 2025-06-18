@@ -4,6 +4,9 @@
 import {
   getDinos,
 } from "./getDinos.js";
+import {
+  PowerRanker,
+} from "./powerRanker.js";
 
 const ordersLocation = "backend/storage/orders.txt";
 const rankingsLocation = "backend/storage/rankings.json";
@@ -14,17 +17,22 @@ class Ranker {
     this.ordersCache = null;
     this.rankingsCache = null;
     this.servedCache = null;
+    this.rankerAlg = null;
+    this.unseenOrders = [];
   }
   
   async init() {
     this.ordersCache = await this.readOrders();
     this.servedCache = await this.readServed();
+    this.rankingsCache = await this.retrieveRankings(); // my naming scheme is messed up
+    this.generateRankings(this.ordersCache);
   }
 
   async addOrder(order) {
     this.ordersCache.push(order);
     const str = JSON.stringify(order) + "\n";
     await Deno.writeTextFile(ordersLocation, str, { append: true });
+    this.unseenOrders.push(order);
   }
 
   async readOrders() {
@@ -141,10 +149,112 @@ class Ranker {
     
     return returnData;
   }
+  
+  async generateEmptyRankings() {
+    const data = {
+      ranked: [],
+      unseen: [],
+    };
+    const dinosData = await getDinos();
+    const dinos = dinosData.dinos;
+    const hashes = Object.keys(dinos);
+    for (const hash of hashes) {
+      data.unseen.push(hash); // all hashes are unseen
+    }
+    const str = JSON.stringify(data);
+    await Deno.writeTextFile(rankingsLocation, str);
+    this.rankingsCache = data;
+  }
+  
+  async retrieveRankings() {
+    const rawRankings = await Deno.readTextFile(rankingsLocation);
+    if (rawRankings === "") {
+      await this.generateEmptyRankings();
+      return this.rankingsCache;
+    } else {
+      const parsedRankings = JSON.parse(rawRankings);
+      this.rankingsCache = parsedRankings;
+      return parsedRankings;
+    }
+  }
+  
+  async generateRankings(orders) {
+    const processedOrders = [];
+    for (const order of orders) {
+      processedOrders.push(order.ranking);
+    }
+    
+    this.rankerAlg = new PowerRanker(processedOrders);
+    this.updateRankings();
+  }
+  
+  async addOrders(orders) {
+    const processedOrders = [];
+    for (const order of orders) {
+      processedOrders.push(order.ranking);
+    }
+    
+    this.rankerAlg.addRankings(processedOrders);
+    this.updateRankings();
+  }
+  
+  async addUnseenOrders() {
+    await this.addOrders(this.unseenOrders);
+    this.unseenOrders = [];
+  }
+  
+  async updateRankings() {
+    const rankingPairs = this.rankerAlg.getRanking().ranking;
+    const ranking = rankingPairs.map(pair => pair[0]);
+    const seen = new Set(ranking);
+    
+    const unseen = [];
+    const dinosData = await getDinos();
+    const dinos = dinosData.dinos;
+    const hashes = Object.keys(dinos);
+    for (const hash of hashes) {
+      if (!seen.has(hash)) {
+        unseen.push(hash);
+      }
+    }
+    
+    const data = {
+      ranked: ranking,
+      unseen: unseen,
+    };
+    
+    this.rankingsCache = data;
+    const str = JSON.stringify(data);
+    await Deno.writeTextFile(rankingsLocation, str);
+  }
+  
+  async frontendRanking() {
+    const frontendData = {
+      ranked: [],
+      unseen: [],
+    };
+    
+    const dinosData = await getDinos();
+    const dinos = dinosData.dinos;
+    
+    function toFrontendFormat(arr, frontend) {
+      for (const hash of arr) {
+        frontend.push({
+          hash: hash,
+          info: dinos[hash],
+        });
+      }
+    }
+    
+    toFrontendFormat(this.rankingsCache.ranked, frontendData.ranked);
+    toFrontendFormat(this.rankingsCache.unseen, frontendData.unseen);
+    
+    return frontendData;
+  }
 }
 
 const ranker = new Ranker();
 
-export {
+export {  
   ranker,
 };

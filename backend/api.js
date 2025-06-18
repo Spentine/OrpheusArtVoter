@@ -29,7 +29,7 @@ async function handleApi(_req, hostname) {
         "content-type": "application/json",
       },
     });
-  } if (path === "/api/dinos/set") {
+  } else if (path === "/api/dinos/set") {
     const four = await ranker.retrieveFour();
     
     return new Response(JSON.stringify(four), {
@@ -38,7 +38,7 @@ async function handleApi(_req, hostname) {
         "content-type": "application/json",
       },
     });
-  } if (path === "/api/dinos/submit") {
+  } else if (path === "/api/dinos/submit") {
     const rankingData = await _req.json();
     
     // verification
@@ -70,6 +70,24 @@ async function handleApi(_req, hostname) {
     await ranker.writeToServed(ranker.servedCache);
     
     return new Response("OK, i think", {
+      status: 200,
+      headers: {
+        "content-type": "text/plain",
+      },
+    });
+  } else if (path === "/api/ranking") {
+    const rankings = await ranker.frontendRanking();
+    
+    return new Response(JSON.stringify(rankings), {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+  } else if (path === "/api/ranking/update") {
+    await ranker.addUnseenOrders();
+    
+    return new Response("OK, updated rankings", {
       status: 200,
       headers: {
         "content-type": "text/plain",
