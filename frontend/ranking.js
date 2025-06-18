@@ -1,6 +1,18 @@
 async function main() {
   console.log("Script loaded successfully.");
   const rankingContaniner = document.getElementById("ranking-container");
+  const infoContainer = document.getElementById("info");
+  
+  async function getInfo() {
+    const dinoCountResponse = await fetch("/api/dinos/count");
+    const dinoCount = await dinoCountResponse.text();
+    
+    const orderCountResponse = await fetch("/api/order/count");
+    const orderCount = await orderCountResponse.text();
+    
+    const text = `${dinoCount} Dinos, ${orderCount} Orderings`;
+    infoContainer.textContent = text;
+  }
   
   async function getRankings() {
     const response = await fetch("/api/ranking");
@@ -34,6 +46,7 @@ async function main() {
     await renderIntoContainer(ranked, rankingContaniner);
   }
   
+  getInfo();
   renderRankings();
 }
 
