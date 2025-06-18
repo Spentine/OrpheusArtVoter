@@ -90,22 +90,40 @@ function makeVotingMenu() {
   
     function addInteractivity(image, index) {
       // make the image draggable
-      function mouseDown(event) {
+      function mouseDown(event, type) {
         // cancel default behavior
         event.preventDefault();
         
+        let pos;
+        if (type === "click") {
+          pos = event;
+        } else if (type === "touch") {
+          pos = event.touches[0];
+        }
+        
         // get relative position of the mouse
         const bounds = image.getBoundingClientRect();
-        const offsetX = event.clientX - bounds.left;
-        const offsetY = event.clientY - bounds.top;
+        const offsetX = pos.clientX - bounds.left;
+        const offsetY = pos.clientY - bounds.top;
         
         // mouse move event to drag the image
         function onMouseMove(moveEvent) {
+          let pos;
+          if (type === "click") {
+            pos = moveEvent;
+          } else if (type === "touch") {
+            pos = moveEvent.touches[0];
+          }
+          
           image.classList.add("dragged-image");
-          image.style.left = `${moveEvent.clientX - offsetX}px`;
-          image.style.top = `${moveEvent.clientY - offsetY}px`;
+          image.style.left = `${pos.clientX - offsetX}px`;
+          image.style.top = `${pos.clientY - offsetY}px`;
         }
-        document.addEventListener("mousemove", onMouseMove);
+        if (type === "click") {
+          document.addEventListener("mousemove", onMouseMove);
+        } else if (type === "touch") {
+          document.addEventListener("touchmove", onMouseMove);
+        }
         
         // mouse up event to drop the image
         function onMouseUp(event) {
@@ -199,14 +217,24 @@ function makeVotingMenu() {
           image.style.left = "0px";
           image.style.top = "0px";
           image.classList.remove("dragged-image");
-          document.removeEventListener("mousemove", onMouseMove);
-          document.removeEventListener("mouseup", onMouseUp);
+          if (type === "click") {
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+          } else if (type === "touch") {
+            document.removeEventListener("touchmove", onMouseMove);
+            document.removeEventListener("touchend", onMouseUp);
+          }
           
           updateFinishStatus();
         }
-        document.addEventListener("mouseup", onMouseUp);
+        if (type === "click") {
+          document.addEventListener("mouseup", onMouseUp);
+        } else if (type === "touch") {
+          document.addEventListener("touchend", onMouseUp);
+        }
       }
-      image.addEventListener("mousedown", mouseDown);
+      image.addEventListener("mousedown", (e) => (mouseDown(e, "click")));
+      image.addEventListener("touchstart", (e) => (mouseDown(e, "touch")));
     }
     
     /**

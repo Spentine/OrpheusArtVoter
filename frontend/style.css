@@ -95,3 +95,27 @@ button:hover:not(:disabled) {
   justify-content: center;
   align-items: center;
 }
+
+.links-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.link {
+  background-color: #00000020;
+  border: 1px solid #00000080;
+  border-radius: 4px;
+  
+  padding: 8px;
+  text-decoration: none;
+  color: #0c3e4b;
+  font-weight: bold;
+  font-size: 36px;
+}
+
+.link:hover {
+  background-color: #00000040;
+}

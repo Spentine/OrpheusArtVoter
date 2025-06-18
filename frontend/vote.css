@@ -78,4 +78,5 @@ body {
 
 .dragged-image {
   position: absolute;
+  transform: scale(1.2);
 }
