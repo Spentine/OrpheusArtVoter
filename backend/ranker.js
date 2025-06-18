@@ -11,6 +11,7 @@ import {
 const ordersLocation = "backend/storage/orders.txt";
 const rankingsLocation = "backend/storage/rankings.json";
 const servedLocation = "backend/storage/served.json";
+const rankerExpiryLocation = "backend/storage/rankerExpiry.txt";
 
 class Ranker {
   constructor() {
@@ -198,12 +199,30 @@ class Ranker {
     this.updateRankings();
   }
   
-  async addUnseenOrders() {
+  async addUnseenOrders(force=false) {
+    if (!force) {
+      // check expiry
+      const expired = await this.checkRankingExpired();
+      if (!expired) return false;
+    }
     await this.addOrders(this.unseenOrders);
     this.unseenOrders = [];
+    return true;
   }
   
-  async updateRankings() {
+  async checkRankingExpired() {
+    const expiry = Number(await Deno.readTextFile(rankerExpiryLocation));
+    const now = Date.now();
+    return (expiry < now || expiry !== "") 
+  }
+  
+  async updateRankings(force=false) {
+    if (!force) {
+      // check expiry
+      const expired = await this.checkRankingExpired();
+      if (!expired) return false;
+    };
+    
     const rankingPairs = this.rankerAlg.getRanking().ranking;
     const ranking = rankingPairs.map(pair => pair[0]);
     const seen = new Set(ranking);
@@ -226,6 +245,11 @@ class Ranker {
     this.rankingsCache = data;
     const str = JSON.stringify(data);
     await Deno.writeTextFile(rankingsLocation, str);
+    
+    // update expiry
+    const expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+    await Deno.writeTextFile(rankerExpiryLocation, expiryTime.toString());
+    return true;
   }
   
   async frontendRanking() {

@@ -76,6 +76,7 @@ async function handleApi(_req, hostname) {
       },
     });
   } else if (path === "/api/ranking") {
+    const updated = await ranker.addUnseenOrders();
     const rankings = await ranker.frontendRanking();
     
     return new Response(JSON.stringify(rankings), {
@@ -85,10 +86,10 @@ async function handleApi(_req, hostname) {
       },
     });
   } else if (path === "/api/ranking/update") {
-    await ranker.addUnseenOrders();
+    const updated = await ranker.addUnseenOrders();
     
-    return new Response("OK, updated rankings", {
-      status: 200,
+    return new Response("update status: " + updated, {
+      status: 299,
       headers: {
         "content-type": "text/plain",
       },
