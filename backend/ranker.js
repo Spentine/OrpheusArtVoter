@@ -229,6 +229,7 @@ class Ranker {
   }
   
   async addUnseenOrders(force=false) {
+    if (this.unseenOrders.length === 0) return false; // no unseen orders to add
     if (!force) {
       // check expiry
       const expired = await this.checkRankingExpired();
