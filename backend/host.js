@@ -14,16 +14,31 @@ function getPathType(path) {
   }
 }
 
-async function handler(_req) {
+/* taken from stackoverflow to get ip address */
+function assertIsNetAddr (addr) {
+  if (!['tcp', 'udp'].includes(addr.transport)) {
+    throw new Error('Not a network address');
+  }
+}
+
+function getRemoteAddress (connInfo) {
+  assertIsNetAddr(connInfo.remoteAddr);
+  return connInfo.remoteAddr;
+}
+/* stackoverflow end */
+
+async function handler(_req, connInfo) {
+  const {hostname, port} = getRemoteAddress(connInfo);
+  
   const url = new URL(_req.url);
   const path = url.pathname;
   const pathType = getPathType(path);
   console.log(path);
   
   if (pathType === "frontend") {
-    return handleFrontend(_req);
+    return handleFrontend(_req, hostname);
   } else if (pathType === "api") {
-    return handleApi(_req);
+    return handleApi(_req, hostname);
   }
 }
 
