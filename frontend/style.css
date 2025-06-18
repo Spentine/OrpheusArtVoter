@@ -22,10 +22,24 @@ img {
   border: 1px solid #00000080;
 }
 
-.main-title {
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 8px;
+button {
+  background: linear-gradient(90deg, #243d4180, #54543980);
+  border: 1px solid #00000080;
+  border-radius: 4px;
+  
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 24px;
+  padding: 8px;
+}
+
+button:disabled {
+  background-color: #00000080;
+  color: #ffffff80;
+}
+
+button:hover:not(:disabled) {
+  background-color: #ffffff80;
 }
 
 .main-subtitle {
@@ -68,4 +82,10 @@ img {
 
 .centered-text {
   text-align: center;
+}
+
+.center-inside {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

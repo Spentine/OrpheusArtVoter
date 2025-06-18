@@ -20,6 +20,8 @@ body {
   border: 1px solid #00000080;
   border-radius: 4px;
   padding: 16px;
+  
+  user-select: none;
 }
 
 .image-holder {

@@ -55,12 +55,23 @@ function makeVotingMenu() {
   
   const aboutText = document.createElement("p");
   aboutText.className = "centered-text";
-  aboutText.textContent = "Drag the images to rank them.";
+  aboutText.textContent = "Drag the images to rank them. Better images go left.";
+  
+  const submitButtonContainer = document.createElement("div");
+  submitButtonContainer.className = "center-inside";
+  
+  const submitButton = document.createElement("button");
+  submitButton.className = "submit-button";
+  submitButton.textContent = "Submit Ranking";
+  submitButton.disabled = true;
+  
+  submitButtonContainer.appendChild(submitButton);
   
   votingMenu.appendChild(title);
   votingMenu.appendChild(imageHolder);
   votingMenu.appendChild(aboutText);
   votingMenu.appendChild(rankingHolder);
+  votingMenu.appendChild(submitButtonContainer);
   
   votingContainer.appendChild(votingMenu);
   document.body.appendChild(votingContainer);
@@ -74,6 +85,8 @@ function makeVotingMenu() {
     const dinos = dinosData.data;
     const images = [];
     const imageLocations = [];
+    
+    submitButton.disabled = true;
   
     function addInteractivity(image, index) {
       // make the image draggable
@@ -188,17 +201,32 @@ function makeVotingMenu() {
           image.classList.remove("dragged-image");
           document.removeEventListener("mousemove", onMouseMove);
           document.removeEventListener("mouseup", onMouseUp);
+          
+          updateFinishStatus();
         }
         document.addEventListener("mouseup", onMouseUp);
       }
       image.addEventListener("mousedown", mouseDown);
     }
     
+    /**
+     * check if all the images are ranked
+     */
+    function updateFinishStatus() {
+      const finished = imageLocations.every(image => image.type === "ranking");
+      submitButton.disabled = !finished;
+    }
+    
     for (let i = 0; i < imageContainers.length; i++) {
       const imageContainer = imageContainers[i];
-      // clear the image container
+      const rankingContainer = rankingContainers[i];
+      
+      // clear the image containers
       while (imageContainer.firstChild) {
         imageContainer.removeChild(imageContainer.firstChild);
+      }
+      while (rankingContainer.firstChild) {
+        rankingContainer.removeChild(rankingContainer.firstChild);
       }
       
       // create a new image element
@@ -214,6 +242,33 @@ function makeVotingMenu() {
       });
       addInteractivity(image, i);
     }
+    
+    // submit button click event
+    async function submitRanking() {
+      // get the keys of the images in the ranking containers
+      const rankingData = [null, null, null, null];
+      for (let i=0; i<imageLocations.length; i++) {
+        const index = imageLocations[i].index;
+        rankingData[index] = order[i];
+      }
+      
+      // POST request with information
+      const req = fetch("/api/dinos/submit", {
+        method: "POST",
+        body: JSON.stringify(rankingData),
+        headers: {
+          "Content-type": "application/json",
+        },
+      });
+      console.log("Submitted Request", req);
+      
+      // remove event listener
+      submitButton.removeEventListener("click", submitRanking);
+      
+      // more images
+      newImages();
+    }
+    submitButton.addEventListener("click", submitRanking);
   }
   
   return {
