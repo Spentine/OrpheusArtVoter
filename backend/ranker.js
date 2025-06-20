@@ -277,7 +277,7 @@ class Ranker {
     await Deno.writeTextFile(rankingsLocation, str);
     
     // update expiry
-    const expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+    const expiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
     await Deno.writeTextFile(rankerExpiryLocation, expiryTime.toString());
     return true;
   }
