@@ -17,3 +17,6 @@ The `served.json` file can be rebuilt by using `ranker.inferServed()`, which wil
 
 ## Support
 The program supports both mouse interactions and touch, but only with one finger at a time. Keyboard interaction may be added in the future, but not at the moment because it works fine as-is.
+
+## Docker
+i fucking hate docker
