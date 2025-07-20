@@ -1,5 +1,4 @@
-// should handle ranking the images based off of many users' preferences
-// did not implement rankings yet
+// should handle ranking the images based off of many users' preferences\
 
 import {
   getDinos,
